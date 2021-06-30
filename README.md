@@ -78,16 +78,16 @@ train_loader   = DataLoader(train_dataset, batch_size, True, num_workers = 4, pi
     - [x] kitti_eigen_zhou
 2. frame ids: [-2, -1, 0]
     - [x] kitti_benchmark
-    - [] kitti_eigen
-    - [] kitti_eigen_zhou
+    - [ ] kitti_eigen
+    - [ ] kitti_eigen_zhou
 3. frame ids: [-2, -1, 0, 1, 2]
     - [x] kitti_benchmark
-    - [] kitti_eigen
-    - [] kitti_eigen_zhou
+    - [ ] kitti_eigen
+    - [ ] kitti_eigen_zhou
 4. frame_ids: [-4, -3, -2, -1, 0]
-    - [] kitti_benchmark
-    - [] kitti_eigen
-    - [] kitti_eigen_zhou
+    - [ ] kitti_benchmark
+    - [ ] kitti_eigen
+    - [ ] kitti_eigen_zhou
 직접 만든 kitti_landau splits은 KITTI 데이터의 날짜별 시퀀스 마다 양 끝 4장의 목록은 싣지 않음  
 그리고 여러 논문들의 KITTI 레거시 데이터 로더와 호환되는 양식으로 작성  
 4. 위의 모든 경우에 대해서
