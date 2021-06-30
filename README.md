@@ -72,22 +72,22 @@ train_loader   = DataLoader(train_dataset, batch_size, True, num_workers = 4, pi
 모노큘라 태스크를 풀 경우, 입력 프레임 시퀀스에서 키 프레임은 중앙에 있는 경우가 대부분  
 경우에 따라 키 프레임이 오른쪽 끝 (시간 방향으로 가장 마지막)에 있을 수 있다.  
 기존 KITTI 데이터에서 splits 타입으로 알려진건 kitti_benchmark, kitti_eigen, kitti_eigen_zhou  
-1. frame ids: [-1, 0, 1]
-    - [x] kitti_benchmark
-    - [x] kitti_eigen
-    - [x] kitti_eigen_zhou
-2. frame ids: [-2, -1, 0]
-    - [x] kitti_benchmark
-    - [ ] kitti_eigen
-    - [ ] kitti_eigen_zhou
-3. frame ids: [-2, -1, 0, 1, 2]
-    - [x] kitti_benchmark
-    - [ ] kitti_eigen
-    - [ ] kitti_eigen_zhou
-4. frame_ids: [-4, -3, -2, -1, 0]
-    - [ ] kitti_benchmark
-    - [ ] kitti_eigen
-    - [ ] kitti_eigen_zhou
+1. frame ids: [-1, 0, 1]  
+    - [x] kitti_benchmark  
+    - [x] kitti_eigen  
+    - [x] kitti_eigen_zhou  
+2. frame ids: [-2, -1, 0]  
+    - [x] kitti_benchmark  
+    - [ ] kitti_eigen  
+    - [ ] kitti_eigen_zhou  
+3. frame ids: [-2, -1, 0, 1, 2]  
+    - [x] kitti_benchmark  
+    - [ ] kitti_eigen  
+    - [ ] kitti_eigen_zhou  
+4. frame_ids: [-4, -3, -2, -1, 0]  
+    - [ ] kitti_benchmark  
+    - [ ] kitti_eigen  
+    - [ ] kitti_eigen_zhou  
 직접 만든 kitti_landau splits은 KITTI 데이터의 날짜별 시퀀스 마다 양 끝 4장의 목록은 싣지 않음  
 그리고 여러 논문들의 KITTI 레거시 데이터 로더와 호환되는 양식으로 작성  
 4. 위의 모든 경우에 대해서
