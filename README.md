@@ -34,26 +34,39 @@ from png to jpg
 find dataset/ -name '*.png' | parallel 'convert -quality 92 -sampling-factor 2x2,1x1,1x1 {.}.png {.}.jpg && rm {}'
 find dataset/ -name '*.png' | parallel 'convert {.}.png {.}.jpg && rm {}'
 ```
-### KITTI folder
+# Folder
 ```
-ㄴKITTI
-    ㄴ2011_09_26/2011_09_26_drive_0001_sync
-            ㄴimage_00/data
-            ㄴimage_01/data
-            ㄴimage_02/data
-                ㄴ0000000000.jpg
-                ㄴ0000000001.jpg
-            ㄴimage_03/data
-                ㄴ0000000000.jpg
-                ㄴ0000000001.jpg
-            ㄴvelodyne_points/data
-                ㄴ0000000000.bin
-                ㄴ0000000001.bin
-    ㄴ2011_09_26/2011_09_26_drive_0002_sync
-    ㄴ2011_09_28
-    ㄴ2011_09_29
-    ㄴ2011_09_30
-    ㄴ2011_10_03
+./dataset
+    ㄴKITTI
+        ㄴ2011_09_26/2011_09_26_drive_0001_sync
+                ㄴimage_00/data
+                ㄴimage_01/data
+                ㄴimage_02/data
+                    ㄴ0000000000.jpg
+                    ㄴ0000000001.jpg
+                ㄴimage_03/data
+                    ㄴ0000000000.jpg
+                    ㄴ0000000001.jpg
+                ㄴvelodyne_points/data
+                    ㄴ0000000000.bin
+                    ㄴ0000000001.bin
+        ㄴ2011_09_26/2011_09_26_drive_0002_sync
+        ㄴ2011_09_28
+        ㄴ2011_09_29
+        ㄴ2011_09_30
+        ㄴ2011_10_03
+./model_dataloader
+    __init__.py
+    kitti.py
+./splits
+    /kitti_benchmark
+        /train_files.txt
+        /val_files.txt
+    ...
+    ...
+    /kitti_landau
+        /train_files.txt
+        /val_files.txt
 ```
 # Usage (Example)
 ```
