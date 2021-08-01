@@ -15,7 +15,8 @@ import matplotlib.pyplot as plt
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 KITTI 데이터셋을 위한 함수 모듈
-def readlines split 파일을 읽어들이는 함수
+def readlines  스플릿 파일을 읽어들이는 함수
+def savelines  스플릿 파일을 저장하는 함수
 def removefile 레거시 splits에서 n개 프레임 이상을 쓰기 위해 프레임 인덱스가 n 이하인 파일은 제거하는 함수
 def read_cam2cam # 카메라 캘리브레이션 파일을 읽는 함수
 def read_velo2cam # 벨로다인 캘리브레이션 파일을 읽는 함수
