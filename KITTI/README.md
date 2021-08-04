@@ -1,5 +1,5 @@
 # KITTIDataset
-키티 데이터의 모노큘라 시퀀스를 위한 데이터 로더
+키티 데이터의 모노큘라 시퀀스를 위한 데이터 로더  
 (향후 포인트 클라우드를 활용한 핸들링도 포함 예정)  
 # Requirements
 ```
@@ -51,7 +51,8 @@ find dataset/ -name '*.png' | parallel 'convert {.}.png {.}.jpg && rm {}'
                 ㄴvelodyne_points/data
                     ㄴ0000000000.bin
                     ㄴ0000000001.bin
-        ㄴ2011_09_26/2011_09_26_drive_0002_sync
+                    ... ...
+        ㄴ2011_09_26
         ㄴ2011_09_28
         ㄴ2011_09_29
         ㄴ2011_09_30
@@ -63,11 +64,7 @@ find dataset/ -name '*.png' | parallel 'convert {.}.png {.}.jpg && rm {}'
     /kitti_benchmark
         /train_files.txt
         /val_files.txt
-    ...
-    ...
-    /kitti_landau
-        /train_files.txt
-        /val_files.txt
+    ... ...
 ```
 # Usage (Example)
 ```
