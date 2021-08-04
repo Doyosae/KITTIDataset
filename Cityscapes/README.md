@@ -9,8 +9,7 @@ albumentations == 0.5.2
 ```
 ./dataset (직접 구성해야함)
     /cityscapes
-        ...
-        ...
+        ... ...
 ./model_dataloader
     __init__.py
     cityscapes.py
@@ -40,5 +39,5 @@ albumentations == 0.5.2
 ```
 train_filename = read_lines("./splits/cityscapes_landau/train_files.txt")
 dataloader     = CityscapesMonoDataset(
-                    "./dataset/cityscapes", train_filename, True, [0, -1, 1], "train", ".png", 1)
+    "./dataset/cityscapes", train_filename, True, [0, -1, 1], "train", ".png", 1)
 ```
