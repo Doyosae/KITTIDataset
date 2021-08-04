@@ -68,9 +68,9 @@ find dataset/ -name '*.png' | parallel 'convert {.}.png {.}.jpg && rm {}'
 ```
 # Usage (Example)
 ```
-splits   = ["kitti_benchmark", "kitti_landau", "kitti_eigen_full", "kitti_eigen_zhou"]
-datapath = "./dataset/kitti"
-filepath = "./splits" + "/" + splits[1] + "/" + "{}_files.txt"
+splits     = ["kitti_benchmark", "kitti_landau", "kitti_eigen_full", "kitti_eigen_zhou"]
+datapath   = "./dataset/kitti"
+filepath   = "./splits" + "/" + splits[1] + "/" + "{}_files.txt"
 
 batch_size = 8
 scale      = 1
@@ -78,8 +78,9 @@ frame_ids  = [0, -2, -1, 1, 2]
 key_frame  = 2
 train_filename = readlines(filepath.format("train")
 train_dataset  = KITTIMonoDataset(
-                    datapath, train_filename, is_training = True, frame_ids = frame_ids, ext = True, scale_factor = scale))
-train_loader   = DataLoader(train_dataset, batch_size, True, num_workers = 4, pin_memory = True, drop_last = True)
+    datapath, train_filename, is_training = True, frame_ids = frame_ids, ext = ".jpg", scale_factor = scale))
+train_loader   = DataLoader(
+    train_dataset, batch_size, True, num_workers = 4, pin_memory = True, drop_last = True)
 ```
 # Support
 모노큘라 태스크를 풀 경우, 입력 프레임 시퀀스에서 키 프레임은 중앙에 있는 경우가 대부분  
