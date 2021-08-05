@@ -105,13 +105,13 @@ train_loader   = DataLoader(
         /test_files.txt
 ```
 ### Example
+```
 train_filename = read_lines("./splits/city_watson_full/train_files.txt")
 dataloader     = CityscapesMonoDataset(
     "./dataset/cityscapes", train_filename, True, [0, -1, 1], "train", ".png", 256, 512, 4)
+    ```
 ### cityscapes splits
-``` 
 1. cityscapes_benchmark  
 모든 촬영 장소마다의 촬영 이미지를 [위치, 이미지 이름] 형태로 저장해놓은 것  
 2. cityscapes_watson  
 [ManyDepth (CVPR 2021)](https://arxiv.org/abs/2104.14540)에서 사용한 splits  
-```
