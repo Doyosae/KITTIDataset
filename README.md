@@ -8,9 +8,9 @@
 3. 그 외 비디오 데이터셋 지원  
 # Requirements
 ```
-torch
-Pillow
-skimage
+torch >= 1.8.0
+Pillow == 8.1.0
+skimage == 0.18.1
 albumentations == 0.5.2
 or
 albumentations == 1.0.2
