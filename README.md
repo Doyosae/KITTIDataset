@@ -8,6 +8,8 @@ torch
 Pillow
 skimage
 albumentations == 0.5.2
+or
+albumentations == 1.0.2
 ```
 # Usage
 ## KITTI

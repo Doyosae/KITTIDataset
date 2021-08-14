@@ -10,8 +10,12 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 
 import skimage.transform
+import albumentations
 from albumentations import Resize
-from albumentations.pytorch.transforms import ToTensor
+if albumentations.__version__ == "0.5.2":
+    from albumentations.pytorch.transforms import ToTensor
+else:
+    from albumentations.pytorch.transforms import ToTensorV2
 from albumentations.augmentations.transforms import HorizontalFlip
 from albumentations.augmentations.transforms import ColorJitter
 from model_utility import *
@@ -23,21 +27,21 @@ class KITTIMonoDataset(Dataset):
         super(KITTIMonoDataset, self).__init__()
         """
         Args:
-            datapath: "./dataset/kitti"
-            filename: splits file of KITTI
+            datapath:    "./dataset/kitti"
+            filename:    splits file of KITTI
             is_training: True or False
-            frame_ids: relative position list of key frame
-            mode: "train" or "val" or "test"
-            ext: ".jpg" or ".png"
-            scale: 1
+            frame_ids:   relative position list of key frame
+            ext:         ".jpg" or ".png"
+            height:      height of image
+            width:       width of image
+            scale:       pyramid scale of image
         
-        interpolation 1은 쓰지 말 것, 성능이 나오지 않음, 0 아니면 3으로 실험
-        albumentation Resize interpolation option
+        interpolation 1은 쓰지 말 것, 성능이 나오지 않음, 0 아니면 3으로 실험 (albumentation Resize interpolation option)
         0 : cv2.INTER_NEAREST, 
         1 : cv2.INTER_LINEAR, 
         2 : cv2.INTER_CUBIC, 
         3 : cv2.INTER_AREA, 
-        4 : cv2.INTER_LANCZOS4. Default: cv2.INTER_LINEAR.
+        4 : cv2.INTER_LANCZOS4. Default: cv2.INTER_AREA.
         """
         if height % 32 != 0 or width % 32 != 0:
             raise "(H, W)는 32의 나눗셉 나머지가 0일 것, KITTI 권장 사이즈는 (320, 1024) or (192, 640)"
@@ -64,19 +68,7 @@ class KITTIMonoDataset(Dataset):
         self.resize_scale  = (self.height, self.width) # 권장 스케일 (320, 1024), (192, 640)
         self.scale_list    = [(self.height//(2**i), self.width//(2**i)) for i in self.scales]
 
-        """
-        데이터로더 프로세스 플로우
-        1. 좌우로 뒤집을지 말지 결정하는 do_flip(bool)과 함께 이미지를 로드 (원본 이미지)
-           키티 데이터 원본 크기는 (375, 1245)
-        2. 원본 스케일 이미지를 원하는 스케일로 바꾸고, 그 스케일부터 2배율로 줄어드는 리스케일 [0, 1, 2, 3]
-           ("color", <frame_id>, <scale>) 키 형태로 저장
-        3. is_training 모드이면 do_auge를 주고, 각 이미지마다 augmentation을 적용
-           ("color_aug", <frame_id>, <scale>) 키 형태로 저장
-        4. GT로 사용하는 Point2Depth 이미지는 원본 스케일로 저장
-           최소 스케일에 맞게 세팅된 K는 monodepth2의 intrinsic parameter를 따름 
-           -> 변형한 이미지 스케일을 곱해서 복원
-        5. 마지막으로 input_data의 모든 키 값들을 numpy2tensor 변환
-        """
+
         for scale, (height, width) in enumerate(self.scale_list):
             self.resize[scale] = Resize(
                 height = int(height), width  = int(width), interpolation = self.inter)
@@ -92,12 +84,36 @@ class KITTIMonoDataset(Dataset):
         self.HorizontalFlip = HorizontalFlip(p = 1.0)
         self.ColorJitter    = ColorJitter(
             brightness = self.brightness, contrast = self.contrast, saturation = self.saturation, hue = self.hue, p = 1.0)
-        self.image2tensor   = ToTensor()
+        if albumentations.__version__ == "0.5.2":
+            self.image2tensor = ToTensor()
+        else:
+            self.image2tensor = ToTensorV2()
+            
         print(">>>  KITTI scaling table")
-        print(">>>  Is training???    :  {0}".format(self.is_training))
         print(">>>  Interpolation     :  {0}".format(self.inter))
-        print(">>>  Scale factor      :  {0}".format(self.scale))
+        print(">>>  Is training???    :  {0}".format(self.is_training))
         print(">>>  Resolution List   :  {0}".format(self.scale_list))
+
+
+    def flip_image(self, numpy_image):
+        numpy_image = self.HorizontalFlip(image = numpy_image)
+        return numpy_image[self.augment_key]
+
+    def resize_image(self, scale, numpy_image):
+        numpy_image = self.resize[scale](image = numpy_image)
+        return numpy_image[self.augment_key]
+
+    def recolor_image(self, numpy_image):
+        numpy_image = self.ColorJitter(image = numpy_image)
+        return numpy_image[self.augment_key]
+
+    def numpy2tensor(self, numpy_image):
+        if albumentations.__version__ == "0.5.2":
+            tensor_image = self.image2tensor(image = numpy_image)
+        else:
+            tensor_image = self.image2tensor(image = numpy_image)
+            tensor_image[self.augment_key] = tensor_image[self.augment_key] / 255.0
+        return tensor_image[self.augment_key]
 
 
     def get_image_path(self, folder_name, frame_index, side):
@@ -111,7 +127,6 @@ class KITTIMonoDataset(Dataset):
         point_name = "velodyne_points/data/{:010d}.bin".format(key_frame)
         point_path = os.path.join(self.datapath, folder_name, point_name)
         return calib_path, point_path
-
 
     def load_image(self, image_path, do_flip): # 이미지를 로드, 나중에 PIL로 고치기
         with open(image_path, 'rb') as f:
@@ -151,37 +166,18 @@ class KITTIMonoDataset(Dataset):
             calib_path = calib_path, point_path = point_path, cam = self.side_map[side])
         depth = skimage.transform.resize(
             depth, (1242, 375)[::-1], order = 0, preserve_range = True, mode = "constant")
-        depth = np.reshape(depth, (depth.shape[0], depth.shape[1], 1))
+        depth = np.reshape(depth, (1, depth.shape[0], depth.shape[1])).astype(np.float32)
         # depth = self.depth_resize(image = depth)
-        # depth = np.reshape(depth["image"], (depth["image"].shape[0], depth["image"].shape[1], 1))
+        # depth = np.reshape(depth["image"], (1, depth["image"].shape[0], depth["image"].shape[1]))
         
         if do_flip == True:
             depth = self.flip_image(depth)
         return depth
 
-
-    def flip_image(self, numpy_image):
-        numpy_image = self.HorizontalFlip(image = numpy_image)
-        return numpy_image[self.augment_key]
-
-    def resize_image(self, scale, numpy_image):
-        numpy_image = self.resize[scale](image = numpy_image)
-        return numpy_image[self.augment_key]
-
-    def recolor_image(self, numpy_image):
-        numpy_image = self.ColorJitter(image = numpy_image)
-        return numpy_image[self.augment_key]
-
-    def numpy2tensor(self, numpy_image):
-        tensor_image = self.image2tensor(image = numpy_image)
-        return tensor_image[self.augment_key]
-
-
     def preprocessing_image(self, input_data, folder_name, key_frame, side, do_flip):
         """
         key_frame는 키프레임 (시퀀스의 중앙에 있을수도, 맨 뒤에 있을수도 있음)
         frame_ids가 중요한데 key_frame (키 프레임) 기준으로 상대적인 위치를 나타냄
-
         ex)
         key_frame = 123, frame_ids = [-1, 0, 1]
         for index in frame_ids:
@@ -201,7 +197,7 @@ class KITTIMonoDataset(Dataset):
         """
         calib_path, point_path   = self.get_point_path(folder_name, key_frame)
         depth                    = self.load_point(calib_path, point_path, side, do_flip)
-        input_data[("depth", 0)] = depth
+        input_data[("depth", 0)] = torch.from_numpy(depth)
         return input_data
 
     def preprocessing_intrinsic(self, input_data):
@@ -239,12 +235,10 @@ class KITTIMonoDataset(Dataset):
         key_frame   = int(batch_line[1])
         side        = batch_line[2]
     
-        # input_data 딕셔너리를 지정하고, folder_name, key_frame, side 여부,
-        # do_flip으로 이미지 전처리와 뎁스 전처리
+        # input_data 딕셔너리를 지정하고, folder_name, key_frame, side 여부 입력
+        # 이미지 로드하고, 넘파이 타입에서 이미지 전처리 (flip -> resize -> recolor)
         input_data = {}
-        input_data = self.preprocessing_image(input_data, folder_name, key_frame, side, do_flip)        
-        input_data = self.preprocessing_point(input_data, folder_name, key_frame, side, do_flip)
-
+        input_data = self.preprocessing_image(input_data, folder_name, key_frame, side, do_flip)      
         if do_auge:
             for frame_id in self.frame_ids:
                 input_data.update({("color_aug", frame_id, scale):
@@ -253,11 +247,12 @@ class KITTIMonoDataset(Dataset):
             for frame_id in self.frame_ids:
                 input_data.update({("color_aug", frame_id, scale):
                     input_data[("color", frame_id, scale)] for scale in self.scales})
-        
-        # input_data에 포함된 모든 키의 값을 torch.tensor 타입으로 변환
+        # input_data의 모든 이미지를 텐서 타입으로 변환
         input_data.update({key: self.numpy2tensor(input_data[key]) for key in input_data})
 
-        # 원본 이미지를 스케일링한 비율만큼 K, inv_K도 동일하게 스케일링
+        # 1. 원본 이미지를 스케일링한 비율만큼 K, inv_K도 동일하게 스케일링
+        # 2. Point Cloud의 뎁스 데이터를 로드
+        input_data = self.preprocessing_point(input_data, folder_name, key_frame, side, do_flip)
         input_data = self.preprocessing_intrinsic(input_data)
         return input_data
 
