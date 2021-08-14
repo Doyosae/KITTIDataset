@@ -47,23 +47,13 @@ find dataset/ -name '*.png' | parallel 'convert {.}.png {.}.jpg && rm {}'
 ./dataset
     ㄴKITTI
         ㄴ2011_09_26/2011_09_26_drive_0001_sync
-                ㄴimage_00/data
-                ㄴimage_01/data
                 ㄴimage_02/data
-                    ㄴ0000000000.jpg
-                    ㄴ0000000001.jpg
+                    ㄴ0000000000.jpg ... ...
                 ㄴimage_03/data
-                    ㄴ0000000000.jpg
-                    ㄴ0000000001.jpg
+                    ㄴ0000000000.jpg ... ...
                 ㄴvelodyne_points/data
-                    ㄴ0000000000.bin
-                    ㄴ0000000001.bin
-                    ... ...
-        ㄴ2011_09_26
-        ㄴ2011_09_28
-        ㄴ2011_09_29
-        ㄴ2011_09_30
-        ㄴ2011_10_03
+                    ㄴ0000000000.bin ... ...
+        ... ...
 ./model_loader
     __init__.py
     kitti.py
