@@ -126,7 +126,7 @@ def sub2ind(matrixSize, rowSub, colSub):
     return rowSub * (n-1) + colSub - 1
 
 
-def Point2Depth(calib_path, point_path, cam = 2, vel_depth = False):
+def point2depth(calib_path, point_path, cam = 2, vel_depth = False):
     """
     캘리브레이션 경로와 벨로다인 파일 경로를 읽어서 뎁스 맵을 만드는 함수
     Args:
@@ -456,12 +456,10 @@ def save_lines(filename, datapath: str):
 
 
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-기타 모듈
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-class tools(object):
+class Tools(object):
     def __init__(self):
         pass
+
 
     @staticmethod
     def tensor2numpy(tensor): # 토치 텐서를 넘파이로
@@ -480,16 +478,20 @@ class tools(object):
 
     @staticmethod
     def sample_dataset(dataloader, end): # 모델 데이터로터에서 배치 샘플 하나를 추출
-        test = []
-        start = time.time()
+        sample = []
+        start  = time.time()
         for index, data in tqdm(enumerate(dataloader)):
-            test.append(data)
-            if index == end:
+            sample.append(data)
+
+            if end == index:
                 break
-            if index == "all":
+            elif end == "all":
                 pass
+            else:
+                raise "end is 'int' or 'all'"
+
         print("batch sampling time:  ", time.time() - start)
-        return test
+        return sample
 
 
     @staticmethod
@@ -499,6 +501,8 @@ class tools(object):
         Args: tensor type
                 Pytorch:    [B, N, H, W]
                 Tensorflow: [B, H, W, C]
+        
+        토치면 [B, C, H, W]이거나 [C, H, W]이거나
         """
         plt.rcParams["figure.figsize"] = size
 

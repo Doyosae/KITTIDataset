@@ -1,10 +1,10 @@
 # Introduction
-1. 키티 데이터의 모노큘라 시퀀스를 위한 데이터로더  
-2. 시티스케이프 데이터의 모노큘라 시퀀스를 위한 데이터로더  
+1. MonoDataset, StereoDataset, MonoStereoDataset for KITTI  
+2. MonoDataset for Cityscapes  
 #
 향후 예정  
 1. 키티의 포인트 클라우드를 활용한 핸들링  
-2. 키티, 시티스케이프의 스테레오 시퀀스를 위한 데이터 로더  
+2. 시티스케이프의 스테레오 시퀀스를 위한 데이터 로더  
 3. 그 외 비디오 데이터셋 지원  
 # Requirements
 ```
@@ -57,7 +57,8 @@ find dataset/ -name '*.png' | parallel 'convert {.}.png {.}.jpg && rm {}'
         ... ...
 ./model_loader
     __init__.py
-    kitti.py
+    kitti_mono.py
+    kitti_stereo.py
 ./splits
     /kitti_benchmark
         /train_files.txt
@@ -69,7 +70,6 @@ find dataset/ -name '*.png' | parallel 'convert {.}.png {.}.jpg && rm {}'
 splits     = ["kitti_benchmark", "kitti_eigen_full", "kitti_eigen_zhou"]
 datapath   = "./dataset/kitti"
 filepath   = "./splits" + "/" + splits[1] + "/" + "{}_files.txt"
-
 batch_size = 8
 scale      = 1
 frame_ids  = [0, -2, -1, 1, 2]
